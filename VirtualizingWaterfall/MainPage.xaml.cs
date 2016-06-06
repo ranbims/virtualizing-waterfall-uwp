@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -22,9 +23,27 @@ namespace VirtualizingWaterfall
     /// </summary>
     public sealed partial class MainPage : Page
     {
+
+        public List<IFixedRenderSize> dataList;
+
         public MainPage()
         {
+            dataList = new List<IFixedRenderSize>();
+            for(int i=0;i<100;i++)
+            {
+                dataList.Add(new SampleData(i.ToString()));
+            }
             this.InitializeComponent();
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+
+            base.OnNavigatedTo(e);
+            await Task.Delay(1000);
+            waterfall.ContainerGenerator = new SampleUIElementGenerator(waterfall.Panel);
+            waterfall.DataSource = dataList;
+            
         }
     }
 }

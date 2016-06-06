@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using VirtualizingWaterfall;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
@@ -19,6 +20,14 @@ namespace VirtualizingWaterfall
         private ScrollViewer _scrollViewer;
         private WaterfallPresenter _waterfallPresenter;
 
+        public WaterfallPresenter Panel
+        {
+            get
+            {
+                return _waterfallPresenter;
+            }
+        }
+
         public IList<IFixedRenderSize> DataSource
         {
             get
@@ -28,6 +37,20 @@ namespace VirtualizingWaterfall
             set
             {
                 _waterfallPresenter.OriginalDataSource = value;
+            }
+        }
+
+        private BaseUIElementGenerator _containerGenerator;
+
+        public BaseUIElementGenerator ContainerGenerator
+        {
+            set
+            {
+                _containerGenerator = value;
+                if(_waterfallPresenter != null)
+                {
+                    _waterfallPresenter.ContainerGenerator = value;
+                }
             }
         }
 
@@ -44,11 +67,15 @@ namespace VirtualizingWaterfall
             _scrollViewer.ViewChanged += OnScrollViewerChanged;
 
             _waterfallPresenter = base.GetTemplateChild("waterfallPresenter") as WaterfallPresenter;
+            _waterfallPresenter.ContainerGenerator = _containerGenerator;
             //Todo: Set ContainerGenerator of _waterfallPresenter.
             base.OnApplyTemplate();
         }
 
-        private void OnScrollViewerChanged(object sender, ScrollViewerViewChangedEventArgs e) { }
+        private void OnScrollViewerChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            _waterfallPresenter.UpdateArrangeAreas(_scrollViewer.VerticalOffset, _scrollViewer.VerticalOffset + _scrollViewer.ActualHeight);
+        }
 
         private void OnScrollViewerChanging(object sender, ScrollViewerViewChangingEventArgs e) { }
     }

@@ -12,9 +12,9 @@ namespace VirtualizingWaterfall
     {
         protected Panel _parent;
 
-        private Stack<UIElement> _elements;
+        protected Stack<UIElement> _elements;
 
-        private int _generatedCount;
+        protected int _generatedCount;
 
         public int GeneratedCount { get { return _generatedCount; } }
         public int CacheCount { get { return _elements.Count; } }
@@ -41,7 +41,7 @@ namespace VirtualizingWaterfall
             else
             {
                 newElement = GenerateNewElement();
-                _parent.Children.Add(newElement);
+  //              _parent.Children.Add(newElement);
                 _generatedCount++;
             }
             SetElementData(newElement, data);
@@ -50,7 +50,8 @@ namespace VirtualizingWaterfall
 
         public void CollectCache(UIElement cache)
         {
-            _elements.Push(cache);
+            if(cache != null)
+                _elements.Push(cache);
         }
     }
 }

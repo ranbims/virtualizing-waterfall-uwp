@@ -18,8 +18,8 @@ namespace VirtualizingWaterfall
         #region OriginalDataSource
         public IList<IFixedRenderSize> OriginalDataSource
         {
-            get { return (IList<IFixedRenderSize>)GetValue(SingleFlowMaxWidthProperty); }
-            set { SetValue(SingleFlowMaxWidthProperty, value); }
+            get { return (IList<IFixedRenderSize>)GetValue(OriginalDataSourceProperty); }
+            set { SetValue(OriginalDataSourceProperty, value); }
         }
 
         public static readonly DependencyProperty OriginalDataSourceProperty =
@@ -28,9 +28,9 @@ namespace VirtualizingWaterfall
                 new PropertyMetadata(null, OnOriginalDataSourceChanged));
         private static void OnOriginalDataSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            double newValue = (double)e.NewValue;
-            double oldValue = (double)e.OldValue;
-            if (newValue != 0d && newValue != oldValue)
+            IList<IFixedRenderSize> newValue = (IList<IFixedRenderSize>)e.NewValue;
+            IList<IFixedRenderSize> oldValue = (IList<IFixedRenderSize>)e.OldValue;
+            if (newValue != null && !newValue.Equals(oldValue))
             {
                 (d as WaterfallPresenter).InvalidateMeasure();
             }
@@ -179,20 +179,24 @@ namespace VirtualizingWaterfall
 
             _arrangeAreas.Clear();
             //foreach (IFixedRenderSize elem in OriginalDataSource)
-            for(int i=0;i<OriginalDataSource.Count;i++)
+            if (OriginalDataSource != null)
             {
-                IFixedRenderSize elem = OriginalDataSource[i];
-                double elemLen = elem.FixedRenderHeight;
-                var flow = flowLengthSet.Min;
-                //Initial the arrange rect.
-                int flowIdx = flow.Key;
-                double flowLength = flow.Value;
-                Point pt = new Point(xs[flowIdx], flowLength);
-                ArrangeArea area = new ArrangeArea();
-                area.ArrangeRect = new Rect(pt.X, pt.Y, flowWidth, elemLen);
-                //Resort the flows according to height.
-                flowLengthSet.Remove(flow);
-                flowLengthSet.Add(new KeyValuePair<int, double>(flow.Key, flow.Value + elemLen));
+                for (int i = 0; i < OriginalDataSource.Count; i++)
+                {
+                    IFixedRenderSize elem = OriginalDataSource[i];
+                    double elemLen = elem.FixedRenderHeight;
+                    var flow = flowLengthSet.Min;
+                    //Initial the arrange rect.
+                    int flowIdx = flow.Key;
+                    double flowLength = flow.Value;
+                    Point pt = new Point(xs[flowIdx], flowLength);
+                    ArrangeArea area = new ArrangeArea();
+                    area.ArrangeRect = new Rect(pt.X, pt.Y, flowWidth, elemLen);
+                    _arrangeAreas.Add(area);
+                    //Resort the flows according to height.
+                    flowLengthSet.Remove(flow);
+                    flowLengthSet.Add(new KeyValuePair<int, double>(flow.Key, flow.Value + elemLen));
+                }
             }
             return new Size(availableSize.Width, flowLengthSet.Max.Value);
         }
@@ -297,28 +301,29 @@ namespace VirtualizingWaterfall
 
         public BaseUIElementGenerator ContainerGenerator { set; get; }
 
-        public void Update_arrangeAreas(double top, double bottom)
+        public void UpdateArrangeAreas(double top, double bottom)
         {
-            //foreach(ArrangeArea area in _arrangeAreas)
-            for(int i=0;i<_arrangeAreas.Count;i++)
-            {
-                ArrangeArea area = _arrangeAreas[i];
-                Rect rect = area.ArrangeRect;
-                if(rect.Bottom > top || rect.Top < bottom)
+            //foreach (ArrangeArea area in _arrangeAreas)
+                for (int i = 0; i < _arrangeAreas.Count; i++)
                 {
-                    //virtualize
-                    ContainerGenerator.CollectCache(area.MappingUIElement);
-                    area.MappingUIElement = null;
-                }
-                else
-                {
+                    ArrangeArea area = _arrangeAreas[i];
+                    Rect rect = area.ArrangeRect;
+                    //if(rect.Bottom < top || rect.Top > bottom)
+                    //{
+                    //    //virtualize
+                    //    ContainerGenerator.CollectCache(area.MappingUIElement);
+                    //    area.MappingUIElement = null;
+                    //}
+                    //else
+                    //{
                     //realize;
                     //Todo: Add a child to container or set values of the item.
                     //Using container or item itself is still not decided.
-                    if(area.MappingUIElement == null)
+                    if (area.MappingUIElement == null)
                         area.MappingUIElement = ContainerGenerator.GenerateUIElement(OriginalDataSource[i]);
+                    //}
                 }
-            }
+
             InvalidateArrange();
         }
     }
