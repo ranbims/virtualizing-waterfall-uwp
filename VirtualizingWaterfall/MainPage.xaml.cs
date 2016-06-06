@@ -29,11 +29,24 @@ namespace VirtualizingWaterfall
         public MainPage()
         {
             dataList = new List<IFixedRenderSize>();
-            for(int i=0;i<100000;i++)
+            for(int i=0;i<100;i++)
             {
                 dataList.Add(new SampleData(i.ToString()));
             }
+            
             this.InitializeComponent();
+            waterfall.LoadMoreItemEvent += Waterfall_LoadMoreItemEvent;
+        }
+
+        private void Waterfall_LoadMoreItemEvent(VirtualizingWaterfall waterfall, double offsetToBottom)
+        {
+            if(waterfall.DataSource != null)
+            {
+                for(int i=0;i<20;i++)
+                {
+                    waterfall.DataSource.Add(new SampleData(i.ToString()));
+                }
+            }
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)

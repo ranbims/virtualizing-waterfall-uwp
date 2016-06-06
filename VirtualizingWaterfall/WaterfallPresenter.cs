@@ -283,29 +283,8 @@ namespace VirtualizingWaterfall
             }
         }
 
-        #region Virtualizing properties and method
-        private bool isAreaShouldBeVirtualized(Rect rect)
-        {
-            return (rect.Bottom < VirtualizedAreaOffset || rect.Top > VirtualizedAreaOffset + VirtualizedAreaHeight);
-        }
-
-        public interface IVirtualizing
-        {
-            void Virtualize();
-            void Realize();
-        }
-        #endregion
-
 
         private IList<ArrangeArea> _arrangeAreas = new List<ArrangeArea>();
-
-
-        /// <summary>
-        /// There should be a container to hold the real object.
-        /// </summary>
-        //private ContainerGenerator<UIElement> _containerGenerator;
-
-        //private BaseUIElementGenerator _containerGenerator;
 
         public BaseUIElementGenerator ContainerGenerator { set; get; }
 
@@ -333,6 +312,36 @@ namespace VirtualizingWaterfall
             }
 
             InvalidateArrange();
+        }
+
+        
+        /// <summary>
+        /// If you change the data source by adding and removing the elements from the collection
+        /// rather than changing the reference, please call this method to ensure data is ready to be readered.
+        /// 
+        /// Important: Adding or removing should be used at the end of the data list.
+        /// </summary>
+        public void UpdateOriginalDataSource()
+        {
+            int dataCount = OriginalDataSource.Count;
+            int areaCount = _arrangeAreas.Count;
+            if(dataCount > areaCount)
+            {
+                int count = dataCount - areaCount;
+                while((count--) != 0)
+                {
+                    _arrangeAreas.Add(new ArrangeArea());
+                }
+            }
+            else if(dataCount < areaCount)
+            {
+                for(int i=areaCount; i>dataCount;i--)
+                {
+                    ContainerGenerator.CollectCache(_arrangeAreas[i].MappingUIElement);
+                    _arrangeAreas.RemoveAt(i);
+                }
+            }
+            this.InvalidateMeasure();
         }
     }
 }

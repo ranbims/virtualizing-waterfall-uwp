@@ -28,15 +28,21 @@ namespace VirtualizingWaterfall
             }
         }
 
+        IList<IFixedRenderSize> _dataSource;
+
         public IList<IFixedRenderSize> DataSource
         {
             get
             {
-                return _waterfallPresenter.OriginalDataSource;
+                return _dataSource;
             }
             set
             {
-                _waterfallPresenter.OriginalDataSource = value;
+                _dataSource = value;
+                if (_waterfallPresenter != null)
+                {
+                    _waterfallPresenter.OriginalDataSource = value;
+                }
             }
         }
 
@@ -54,6 +60,14 @@ namespace VirtualizingWaterfall
             }
         }
 
+        public delegate void LoadMoreDataEventHandler(VirtualizingWaterfall waterfall, double offsetToBottom);
+
+        /// <summary>
+        /// This is only a simple event to show that scroller is near the bottom.
+        /// What you should do is loading data in your own method.
+        /// </summary>
+        public event LoadMoreDataEventHandler LoadMoreItemEvent;
+
         public VirtualizingWaterfall()
         {
             this.DefaultStyleKey = typeof(VirtualizingWaterfall);
@@ -68,6 +82,7 @@ namespace VirtualizingWaterfall
 
             _waterfallPresenter = base.GetTemplateChild("waterfallPresenter") as WaterfallPresenter;
             _waterfallPresenter.ContainerGenerator = _containerGenerator;
+            _waterfallPresenter.OriginalDataSource = _dataSource;
             //Todo: Set ContainerGenerator of _waterfallPresenter.
             base.OnApplyTemplate();
         }
@@ -77,6 +92,32 @@ namespace VirtualizingWaterfall
             _waterfallPresenter.UpdateArrangeAreas(_scrollViewer.VerticalOffset, _scrollViewer.VerticalOffset + _scrollViewer.ActualHeight);
         }
 
-        private void OnScrollViewerChanging(object sender, ScrollViewerViewChangingEventArgs e) { }
+        private void OnScrollViewerChanging(object sender, ScrollViewerViewChangingEventArgs e)
+        {
+            double offset = e.FinalView.VerticalOffset;
+            ScrollViewer scrollViewer = sender as ScrollViewer;
+            if (scrollViewer.ExtentHeight - this.ActualHeight - offset < 500)
+            {
+                if (LoadMoreItemEvent != null)
+                {
+                    LoadMoreItemEvent(this, scrollViewer.ExtentHeight - this.ActualHeight - offset);
+                    _waterfallPresenter.UpdateOriginalDataSource();
+                }
+            }
+        }
+
+        /// <summary>
+        /// If you change the data source by adding and removing the elements from the collection
+        /// rather than changing the reference, please call this method to ensure data is ready to be readered.
+        /// 
+        /// Important: Adding or removing should be used at the end of the data list.
+        /// </summary>
+        public void UpdataDataSource()
+        {
+            if(_waterfallPresenter != null)
+            {
+                _waterfallPresenter.UpdateOriginalDataSource();
+            }
+        }
     }
 }
