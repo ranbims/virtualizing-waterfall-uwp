@@ -29,7 +29,7 @@ namespace VirtualizingWaterfall
         public MainPage()
         {
             dataList = new List<IFixedRenderSize>();
-            for(int i=0;i<100;i++)
+            for(int i=0;i<100000;i++)
             {
                 dataList.Add(new SampleData(i.ToString()));
             }

@@ -11,5 +11,6 @@
         <local:VirtualizingWaterfall x:Name="waterfall">
             
         </local:VirtualizingWaterfall>
+        <local:MemoryControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
     </Grid>
 </Page>

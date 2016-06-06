@@ -41,7 +41,7 @@ namespace VirtualizingWaterfall
             else
             {
                 newElement = GenerateNewElement();
-  //              _parent.Children.Add(newElement);
+                _parent.Children.Add(newElement);
                 _generatedCount++;
             }
             SetElementData(newElement, data);

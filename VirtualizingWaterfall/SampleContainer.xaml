@@ -9,7 +9,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid Background="Blue">
+    <Grid x:Name="grid" Background="Blue">
         <TextBlock x:Name="textBlock" Text="default" Width="100" Height="100" FontSize="20"/>
     </Grid>
 </UserControl>

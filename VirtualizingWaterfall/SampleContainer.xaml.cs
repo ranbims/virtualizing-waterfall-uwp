@@ -24,9 +24,10 @@ namespace VirtualizingWaterfall
             this.InitializeComponent();
         }
 
-        public void SetData(String data)
+        public void SetData(SampleData data)
         {
-            textBlock.Text = data;
+            textBlock.Text = data.data;
+            grid.Background = new SolidColorBrush(data.backgroundColor);
         }
     }
 }

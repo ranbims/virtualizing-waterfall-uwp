@@ -30,7 +30,8 @@ namespace VirtualizingWaterfall
             }
             else
             {
-                container.SetData(data.ToString());
+                SampleData sample = data as SampleData;
+                container.SetData(sample);
             }
         }
     }
