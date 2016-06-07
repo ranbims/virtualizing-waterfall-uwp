@@ -109,7 +109,13 @@
     <Compile Include="SampleContainer.xaml.cs">
       <DependentUpon>SampleContainer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SampleControl.xaml.cs">
+      <DependentUpon>SampleControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SampleData.cs" />
+    <Compile Include="SamplePage.xaml.cs">
+      <DependentUpon>SamplePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SampleUIElementGenerator.cs" />
     <Compile Include="VirtualizingWaterfall.cs" />
     <Compile Include="WaterfallPresenter.cs" />
@@ -144,6 +150,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SampleContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SampleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SamplePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

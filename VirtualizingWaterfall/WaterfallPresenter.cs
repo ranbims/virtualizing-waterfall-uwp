@@ -87,6 +87,7 @@ namespace VirtualizingWaterfall
                 WaterfallPresenter panel = d as WaterfallPresenter;
                 //panel._virtualizedAreaBottom = panel._virtualizedAreaTop + newValue;
                 panel.InvalidateArrange();
+                //panel.UpdateArrangeAreas(panel.VirtualizedAreaOffset, panel.VirtualizedAreaOffset + newValue);
             }
         }
         #endregion
@@ -111,6 +112,7 @@ namespace VirtualizingWaterfall
             {
                 WaterfallPresenter panel = d as WaterfallPresenter;
                 //panel.VirtualizedAreaOffset = panel.VirtualizedAreaOffset + newValue;
+                //panel.UpdateArrangeAreas(panel.VirtualizedAreaOffset, panel.VirtualizedAreaOffset + newValue);
                 panel.InvalidateArrange();
             }
         }
@@ -217,7 +219,29 @@ namespace VirtualizingWaterfall
         /// <returns></returns>
         protected override Size ArrangeOverride(Size finalSize)
         {
-            foreach(ArrangeArea area in _arrangeAreas)
+
+            for (int i = 0; i < _arrangeAreas.Count; i++)
+            {
+                ArrangeArea area = _arrangeAreas[i];
+                Rect rect = area.ArrangeRect;
+                if (rect.Bottom < VirtualizedAreaOffset || rect.Top > VirtualizedAreaOffset + VirtualizedAreaHeight)
+                {
+                    //virtualize
+                    ContainerGenerator.CollectCache(area.MappingUIElement);
+                    area.MappingUIElement = null;
+                }
+                else
+                {
+                    //realize;
+                    //Todo: Add a child to container or set values of the item.
+                    //Using container or item itself is still not decided.
+                    if (area.MappingUIElement == null)
+                        area.MappingUIElement = ContainerGenerator.GenerateUIElement(OriginalDataSource[i]);
+                }
+            }
+
+
+            foreach (ArrangeArea area in _arrangeAreas)
             {
                 //if(area.MappingIndex != ArrangeArea.NO_MAPPING)
                 //{

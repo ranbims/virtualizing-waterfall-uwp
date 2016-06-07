@@ -79,6 +79,7 @@ namespace VirtualizingWaterfall
             _scrollViewer = base.GetTemplateChild("scrollViewer") as ScrollViewer;
             _scrollViewer.ViewChanging += OnScrollViewerChanging;
             _scrollViewer.ViewChanged += OnScrollViewerChanged;
+            _scrollViewer.SizeChanged += OnScrollViewerSizeChanged;
 
             _waterfallPresenter = base.GetTemplateChild("waterfallPresenter") as WaterfallPresenter;
             _waterfallPresenter.ContainerGenerator = _containerGenerator;
@@ -87,9 +88,16 @@ namespace VirtualizingWaterfall
             base.OnApplyTemplate();
         }
 
+        private void OnScrollViewerSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            _waterfallPresenter.VirtualizedAreaHeight = e.NewSize.Height;
+            //_waterfallPresenter.UpdateArrangeAreas(_scrollViewer.VerticalOffset, _scrollViewer.VerticalOffset + _scrollViewer.ActualHeight);
+        }
+
         private void OnScrollViewerChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
-            _waterfallPresenter.UpdateArrangeAreas(_scrollViewer.VerticalOffset, _scrollViewer.VerticalOffset + _scrollViewer.ActualHeight);
+            _waterfallPresenter.VirtualizedAreaOffset = _scrollViewer.VerticalOffset;
+            //_waterfallPresenter.UpdateArrangeAreas(_scrollViewer.VerticalOffset, _scrollViewer.VerticalOffset + _scrollViewer.ActualHeight);
         }
 
         private void OnScrollViewerChanging(object sender, ScrollViewerViewChangingEventArgs e)
